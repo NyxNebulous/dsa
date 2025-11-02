@@ -164,7 +164,7 @@ public:
         }
     }
 
-    bool isBST(Node *root, long long minVal, long long maxVal)
+    bool isBST(Node *root, int minVal, int maxVal)
     {
         if (root == NULL)
             return true;
@@ -178,7 +178,7 @@ public:
 
     bool isValidBST(Node *root)
     {
-        return isBST(root, LLONG_MIN, LLONG_MAX);
+        return isBST(root, -1000000000, 1000000000);
     }
 };
 
