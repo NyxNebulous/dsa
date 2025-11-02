@@ -93,114 +93,60 @@ public:
 
     ~Stack() { delete[] arr; }
 };
-
-template <typename T>
-class Queue
-{
-    T *arr;
-    int capacity;
-    int head;
-    int tail;
-    int count;
-
-    void expand()
-    {
-        int newCap = capacity ? capacity * 2 : 1;
-        T *newArr = new T[newCap];
-
-        for (int i = 0; i < count; i++)
-            newArr[i] = arr[(head + i) % capacity];
-
-        delete[] arr;
-        arr = newArr;
-        head = 0;
-        tail = count;
-        capacity = newCap;
-    }
-
-public:
-    Queue()
-    {
-        arr = nullptr;
-        capacity = 0;
-        head = 0;
-        tail = 0;
-        count = 0;
-    }
-
-    void push(T val)
-    {
-        if (count == capacity)
-            expand();
-        arr[tail] = val;
-        tail = (tail + 1) % capacity;
-        count++;
-    }
-
-    void pop()
-    {
-        if (count > 0)
-        {
-            head = (head + 1) % capacity;
-            count--;
-        }
-    }
-
-    T &front() { return arr[head]; }
-    T &back() { return arr[(tail - 1 + capacity) % capacity]; }
-
-    bool empty() const { return count == 0; }
-    int size() const { return count; }
-
-    ~Queue() { delete[] arr; }
-};
-
-
 template <typename T>
 class PriorityQueue {
     T *arr;
     int capacity;
     int count;
+    bool isMinQueue;  // false = Max PQ (Descending), true = Min PQ (Ascending)
 
     void resize() {
         int newCap = capacity ? capacity * 2 : 1;
         T *newArr = new T[newCap];
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < count; i++)
             newArr[i] = arr[i];
-        }
         delete[] arr;
         arr = newArr;
         capacity = newCap;
     }
 
-    void sortDescending() {  // Largest element at front like max-heap
+    void sortQueue() {
         for (int i = 0; i < count - 1; i++) {
             for (int j = i + 1; j < count; j++) {
-                if (arr[i] < arr[j]) {
+                if (!isMinQueue && arr[i] < arr[j])
                     swap(arr[i], arr[j]);
-                }
+                if (isMinQueue && arr[i] > arr[j])
+                    swap(arr[i], arr[j]);
             }
         }
     }
 
 public:
-    PriorityQueue() {
+    PriorityQueue(bool minQueue = false) {
         arr = nullptr;
         capacity = 0;
         count = 0;
+        isMinQueue = minQueue;
+    }
+
+    ~PriorityQueue() {
+        delete[] arr;
     }
 
     void push(T val) {
         if (count == capacity) resize();
         arr[count++] = val;
-        sortDescending();
+        sortQueue();
     }
 
     void pop() {
-        if (count > 0) count--;
+        if (count > 0) count--; // Just reduce size, top element is removed
     }
 
     T& top() {
+        if (count == 0) {
+            throw runtime_error("Priority Queue is empty!");
+        }
         return arr[0];
     }
 
