@@ -138,59 +138,65 @@ void prims(int V, vector<pair<int, int>> adj[]) {
         cout << parent[i] << " - " << i << "  : " << key[i] << endl;
 }
 
-class DSU {
-    vector<int> parent, rank;
+#include <bits/stdc++.h>
+using namespace std;
 
-public:
+struct Edge {
+    int u, v, w;
+};
+
+struct DSU {
+    vector<int> parent, rank;
     DSU(int n) {
         parent.resize(n);
         rank.resize(n, 0);
         for (int i = 0; i < n; i++) parent[i] = i;
     }
-
     int find(int x) {
-        if (parent[x] != x)
-            parent[x] = find(parent[x]); // Path compression
-        return parent[x];
+        if (x == parent[x]) return x;
+        return parent[x] = find(parent[x]); // Path compression
     }
-
     void unite(int x, int y) {
-        int rootX = find(x);
-        int rootY = find(y);
-        if (rootX != rootY) {
-            if (rank[rootX] < rank[rootY])
-                parent[rootX] = rootY;
-            else if (rank[rootX] > rank[rootY])
-                parent[rootY] = rootX;
+        x = find(x);
+        y = find(y);
+        if (x != y) {
+            if (rank[x] < rank[y]) parent[x] = y;
+            else if (rank[x] > rank[y]) parent[y] = x;
             else {
-                parent[rootY] = rootX;
-                rank[rootX]++;
+                parent[y] = x;
+                rank[x]++;
             }
         }
     }
 };
 
-void kruskal(int V, vector<vector<int>>& edges) {
-    // sort(edges.begin(), edges.end(), [](auto &a, auto &b) {
-        // return a[2] < b[2]; // Sort by weight
-    // });
+void kruskal(int V, vector<Edge>& edges) {
+    sort(edges.begin(), edges.end(), [](Edge a, Edge b) {
+        return a.w < b.w;   // Sort by weight
+    });
 
     DSU dsu(V);
-    int totalWeight = 0;
+    int totalCost = 0;
 
-    cout << "Edge  -  Weight\n";
     for (auto &edge : edges) {
-        int u = edge[0];
-        int v = edge[1];
-        int w = edge[2];
-
-        if (dsu.find(u) != dsu.find(v)) {
-            dsu.unite(u, v);
-            totalWeight += w;
-            cout << u << " - " << v << " : " << w << endl;
+        if (dsu.find(edge.u) != dsu.find(edge.v)) { // No cycle
+            totalCost += edge.w;
+            dsu.unite(edge.u, edge.v);
         }
     }
-    cout << "Total weight of MST = " << totalWeight << endl;
+
+    cout << "Total MST Cost (Kruskal's): " << totalCost << endl;
+}
+
+int main() {
+    int V = 5;
+    vector<Edge> edges = {
+        {0, 1, 2}, {1, 2, 3}, {0, 3, 6},
+        {1, 3, 8}, {2, 3, 5}
+    };
+
+    kruskal(V, edges);
+    return 0;
 }
 
 const int INF = 1e9;
