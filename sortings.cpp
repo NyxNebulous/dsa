@@ -126,6 +126,26 @@ void quickSort(vector<int> &arr, int low, int high, Count &c){
     }
 }
 
+void radixSort(vector<int> &arr) {
+    int maxVal = *max_element(arr.begin(), arr.end());
+
+    for (int exp = 1; maxVal / exp > 0; exp *= 10) {
+        vector<vector<int>> buckets(10);
+
+        for (int i = 0; i < arr.size(); i++) {
+            int digit = (arr[i] / exp) % 10;
+            buckets[digit].push_back(arr[i]);
+        }
+
+        int idx = 0;
+        for (int d = 0; d < 10; d++) {
+            for (int val : buckets[d]) {
+                arr[idx++] = val;
+            }
+        }
+    }
+}
+
 int main() {
     vector<int> arr = {10, 3, 5, 2, 8, 6};
 
