@@ -78,6 +78,26 @@ void mergeSort(vector<int> &arr, int l, int r, Count &c) {
     }
 }
 
+
+void shellSort(vector<int>& arr) {
+    int n = arr.size();
+
+    // Start with a big gap, then reduce
+    for (int gap = n / 2; gap > 0; gap /= 2) {
+        // Do a gapped insertion sort
+        for (int i = gap; i < n; i++) {
+            int temp = arr[i];
+            int j = i;
+            while (j >= gap && arr[j - gap] > temp) {
+                arr[j] = arr[j - gap];
+                j -= gap;
+            }
+            arr[j] = temp;
+        }
+    }
+}
+
+
 void heapify(vector<int> &arr, int n, int i, Count &c){
     int largest = i;
     int l = 2 * i + 1, r = 2 * i + 2;
