@@ -1,191 +1,159 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-struct Count {
-    long long comparisons = 0;
-    long long swaps = 0;
-};
+/* =======================
+   BUBBLE SORT
+   ======================= */
 
-void bubbleSort(vector<int> arr, Count &c) {
-    int n = arr.size();
-    for(int i = 0; i < n - 1; i++){
-        for(int j = 0; j < n - i - 1; j++){
-            c.comparisons++;
-            if(arr[j] > arr[j+1]){
-                swap(arr[j], arr[j+1]);
-                c.swaps++;
-            }
-        }
-    }
+// Iterative Bubble Sort
+void bubbleSortIter(vector<int>& a) {
+    int n = a.size();
+    for (int i = 0; i < n - 1; i++)
+        for (int j = 0; j < n - i - 1; j++)
+            if (a[j] > a[j + 1])
+                swap(a[j], a[j + 1]);
 }
 
-void selectionSort(vector<int> arr, Count &c) {
-    int n = arr.size();
-    for(int i = 0; i < n - 1; i++){
+// Recursive Bubble Sort
+void bubbleSortRec(vector<int>& a, int n) {
+    if (n == 1) return;
+    for (int i = 0; i < n - 1; i++)
+        if (a[i] > a[i + 1])
+            swap(a[i], a[i + 1]);
+    bubbleSortRec(a, n - 1);
+}
+
+/* =======================
+   SELECTION SORT
+   ======================= */
+
+// Iterative Selection Sort
+void selectionSortIter(vector<int>& a) {
+    int n = a.size();
+    for (int i = 0; i < n - 1; i++) {
         int minIdx = i;
-        for(int j = i + 1; j < n; j++){
-            c.comparisons++;
-            if(arr[j] < arr[minIdx])
+        for (int j = i + 1; j < n; j++)
+            if (a[j] < a[minIdx])
                 minIdx = j;
-        }
-        if(minIdx != i) {
-            swap(arr[minIdx], arr[i]);
-            c.swaps++;
-        }
+        swap(a[i], a[minIdx]);
     }
 }
 
-void insertionSort(vector<int> arr, Count &c) {
-    int n = arr.size();
-    for(int i = 1; i < n; i++){
-        int key = arr[i];
-        int j = i - 1;
-        while(j >= 0){
-            c.comparisons++;
-            if(arr[j] > key){
-                arr[j+1] = arr[j];
-                c.swaps++;
-                j--;
-            }
-            else break;
-        }
-        arr[j+1] = key;
-    }
+// Recursive Selection Sort
+void selectionSortRec(vector<int>& a, int i) {
+    int n = a.size();
+    if (i == n - 1) return;
+
+    int minIdx = i;
+    for (int j = i + 1; j < n; j++)
+        if (a[j] < a[minIdx])
+            minIdx = j;
+
+    swap(a[i], a[minIdx]);
+    selectionSortRec(a, i + 1);
 }
 
-void merge(vector<int> &arr, int l, int m, int r, Count &c) {
-    int n1 = m - l + 1, n2 = r - m;
-    vector<int> L(n1), R(n2);
-    for(int i = 0; i < n1; i++) L[i] = arr[l + i];
-    for(int i = 0; i < n2; i++) R[i] = arr[m + 1 + i];
+/* =======================
+   MERGE SORT
+   ======================= */
+
+void merge(vector<int>& a, int l, int m, int r) {
+    vector<int> left(a.begin() + l, a.begin() + m + 1);
+    vector<int> right(a.begin() + m + 1, a.begin() + r + 1);
 
     int i = 0, j = 0, k = l;
-    while(i < n1 && j < n2){
-        c.comparisons++;
-        if(L[i] <= R[j]) arr[k++] = L[i++];
-        else arr[k++] = R[j++];
-    }
-    while(i < n1) arr[k++] = L[i++];
-    while(j < n2) arr[k++] = R[j++];
+    while (i < left.size() && j < right.size())
+        a[k++] = (left[i] <= right[j]) ? left[i++] : right[j++];
+
+    while (i < left.size()) a[k++] = left[i++];
+    while (j < right.size()) a[k++] = right[j++];
 }
 
-void mergeSort(vector<int> &arr, int l, int r, Count &c) {
-    if(l < r){
+// Recursive Merge Sort
+void mergeSortRec(vector<int>& a, int l, int r) {
+    if (l >= r) return;
+    int m = (l + r) / 2;
+    mergeSortRec(a, l, m);
+    mergeSortRec(a, m + 1, r);
+    merge(a, l, m, r);
+}
+
+// Iterative Merge Sort
+void mergeSortIter(vector<int>& a) {
+    int n = a.size();
+    for (int size = 1; size < n; size *= 2) {
+        for (int l = 0; l < n - size; l += 2 * size) {
+            int m = l + size - 1;
+            int r = min(l + 2 * size - 1, n - 1);
+            merge(a, l, m, r);
+        }
+    }
+}
+
+/* =======================
+   LINEAR SEARCH
+   ======================= */
+
+// Iterative Linear Search
+int linearSearchIter(vector<int>& a, int key) {
+    for (int i = 0; i < a.size(); i++)
+        if (a[i] == key) return i;
+    return -1;
+}
+
+// Recursive Linear Search
+int linearSearchRec(vector<int>& a, int key, int i) {
+    if (i == a.size()) return -1;
+    if (a[i] == key) return i;
+    return linearSearchRec(a, key, i + 1);
+}
+
+/* =======================
+   BINARY SEARCH (ARRAY MUST BE SORTED)
+   ======================= */
+
+// Iterative Binary Search
+int binarySearchIter(vector<int>& a, int key) {
+    int l = 0, r = a.size() - 1;
+    while (l <= r) {
         int m = l + (r - l) / 2;
-        mergeSort(arr, l, m, c);
-        mergeSort(arr, m + 1, r, c);
-        merge(arr, l, m, r, c);
+        if (a[m] == key) return m;
+        if (a[m] < key) l = m + 1;
+        else r = m - 1;
     }
+    return -1;
 }
 
-
-void shellSort(vector<int>& arr) {
-    int n = arr.size();
-
-    // Start with a big gap, then reduce
-    for (int gap = n / 2; gap > 0; gap /= 2) {
-        // Do a gapped insertion sort
-        for (int i = gap; i < n; i++) {
-            int temp = arr[i];
-            int j = i;
-            while (j >= gap && arr[j - gap] > temp) {
-                arr[j] = arr[j - gap];
-                j -= gap;
-            }
-            arr[j] = temp;
-        }
-    }
+// Recursive Binary Search
+int binarySearchRec(vector<int>& a, int l, int r, int key) {
+    if (l > r) return -1;
+    int m = l + (r - l) / 2;
+    if (a[m] == key) return m;
+    if (a[m] < key) return binarySearchRec(a, m + 1, r, key);
+    return binarySearchRec(a, l, m - 1, key);
 }
 
-
-void heapify(vector<int> &arr, int n, int i, Count &c){
-    int largest = i;
-    int l = 2 * i + 1, r = 2 * i + 2;
-
-    if(l < n){ c.comparisons++; if(arr[l] > arr[largest]) largest = l; }
-    if(r < n){ c.comparisons++; if(arr[r] > arr[largest]) largest = r; }
-
-    if(largest != i){
-        swap(arr[i], arr[largest]);
-        c.swaps++;
-        heapify(arr, n, largest, c);
-    }
-}
-
-void heapSort(vector<int> arr, Count &c){
-    int n = arr.size();
-    for(int i = n / 2 - 1; i >= 0; i--) heapify(arr, n, i, c);
-    for(int i = n - 1; i > 0; i--){
-        swap(arr[0], arr[i]);
-        c.swaps++;
-        heapify(arr, i, 0, c);
-    }
-}
-
-int partitionQS(vector<int> &arr, int low, int high, Count &c){
-    int pivot = arr[high];
-    int i = low - 1;
-    for(int j = low; j < high; j++){
-        c.comparisons++;
-        if(arr[j] <= pivot){
-            i++;
-            swap(arr[i], arr[j]);
-            c.swaps++;
-        }
-    }
-    swap(arr[i+1], arr[high]);
-    c.swaps++;
-    return i + 1;
-}
-
-void quickSort(vector<int> &arr, int low, int high, Count &c){
-    if(low < high){
-        int pi = partitionQS(arr, low, high, c);
-        quickSort(arr, low, pi - 1, c);
-        quickSort(arr, pi + 1, high, c);
-    }
-}
-
-void radixSort(vector<int> &arr) {
-    int maxVal = *max_element(arr.begin(), arr.end());
-
-    for (int exp = 1; maxVal / exp > 0; exp *= 10) {
-        vector<vector<int>> buckets(10);
-
-        for (int i = 0; i < arr.size(); i++) {
-            int digit = (arr[i] / exp) % 10;
-            buckets[digit].push_back(arr[i]);
-        }
-
-        int idx = 0;
-        for (int d = 0; d < 10; d++) {
-            for (int val : buckets[d]) {
-                arr[idx++] = val;
-            }
-        }
-    }
-}
+/* =======================
+   DRIVER
+   ======================= */
 
 int main() {
-    vector<int> arr = {10, 3, 5, 2, 8, 6};
+    vector<int> a = {5, 2, 9, 1, 5, 6};
 
-    Count c1, c2, c3, c4, c5, c6;
+    // Sorting
+    bubbleSortIter(a);
+    // bubbleSortRec(a, a.size());
+    // selectionSortIter(a);
+    // selectionSortRec(a, 0);
+    // mergeSortRec(a, 0, a.size() - 1);
+    // mergeSortIter(a);
 
-    bubbleSort(arr, c1);
-    selectionSort(arr, c2);
-    insertionSort(arr, c3);
-
-    vector<int> v4 = arr; mergeSort(v4, 0, v4.size() - 1, c4);
-    heapSort(arr, c5);
-
-    vector<int> v6 = arr; quickSort(v6, 0, v6.size() - 1, c6);
-
-    cout << "Bubble Sort -> Comparisons: " << c1.comparisons << ", Swaps: " << c1.swaps << endl;
-    cout << "Selection Sort -> Comparisons: " << c2.comparisons << ", Swaps: " << c2.swaps << endl;
-    cout << "Insertion Sort -> Comparisons: " << c3.comparisons << ", Swaps: " << c3.swaps << endl;
-    cout << "Merge Sort -> Comparisons: " << c4.comparisons << ", Swaps: " << c4.swaps << endl;
-    cout << "Heap Sort -> Comparisons: " << c5.comparisons << ", Swaps: " << c5.swaps << endl;
-    cout << "Quick Sort -> Comparisons: " << c6.comparisons << ", Swaps: " << c6.swaps << endl;
+    // Searching
+    int key = 5;
+    cout << "Linear Iter: " << linearSearchIter(a, key) << endl;
+    cout << "Linear Rec : " << linearSearchRec(a, key, 0) << endl;
+    cout << "Binary Iter: " << binarySearchIter(a, key) << endl;
+    cout << "Binary Rec : " << binarySearchRec(a, 0, a.size() - 1, key) << endl;
 
     return 0;
 }
